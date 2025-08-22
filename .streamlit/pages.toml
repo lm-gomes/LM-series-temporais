@@ -7,13 +7,19 @@ icon = "📊"
 path = "pages/historico.py"
 name = "Histórico"
 icon = "🗂️"
-url_path = "historico" 
+url_path = "historico"
+
+[[pages]]
+path = "pages/estatisticas.py"
+name = "Estatísticas"
+icon = "🎯"
+url_path = "estatisticas"
 
 [[pages]]
 path = "pages/upload.py"
 name = "Upload"
 icon = "📤"
-url_path = "upload" 
+url_path = "upload"
 
 [[pages]]
 path = "pages/configuracoes.py"

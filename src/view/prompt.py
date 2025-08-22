@@ -1,40 +1,47 @@
 import streamlit as st
-from src.model.prompt_model import PromptModel, PromptType
-from src.model.dados_model import DadosModel
-from src.model.format_model import TSFormat, TSType
-from src.view.grafico import Grafico
+from src.model.prompt import PromptModel, PromptType
+from src.model.data import Data
+from src.model.format import TSFormat, TSType
+from src.view.graph import Graph
 
 class Prompt:
-	def __init__(
-		self, dataset:str, data_inicio:str, data_fim:str, qtd_periodos:int, tipo_prompt:PromptType, formato_dados:TSFormat = TSFormat.CSV, tipo_serie:TSType = TSType.NUMERIC):
-		"""
-		Classe responsável por manipular o dataset.
+  def __init__(
+    self, dataset:str, start_date:str, end_date:str,
+    periods: int, prompt_type:PromptType,
+    ts_format:TSFormat=TSFormat.CSV,
+    ts_type:TSType=TSType.NUMERIC
+  ):
+    """
+    Classe responsável por manipular o dataset.
 
-		Args:
-			dataset (str): Dataset a ser manipulado.
-			data_inicio (str): Data de início do dataset.
-			data_fim (str): Data de fim do dataset.
-			qtd_periodos (int): Quantidade de períodos a serem previstos.
-			formato_dados (TSFormat): Formato dos dados temporais.
-			tipo_serie (TSType): Tipo de série: 'Numérica' ou 'Textual'.
-		"""
-		self.dataset = dataset
-		self.data_inicio = data_inicio
-		self.data_fim = data_fim
-		self.qtd_periodos = qtd_periodos
-		self.tipo_prompt = tipo_prompt
-		self.formato_dados = formato_dados
-		self.tipo_serie = tipo_serie
+    Args:
+      dataset (str): Dataset a ser manipulado.
+      start_date (str): Data de início do dataset.
+      end_date (str): Data de fim do dataset.
+      periods (int): Quantidade de períodos a serem previstos.
+      prompt_type (PromptType): Tipo do prompt (ZERO_SHOT, FEW_SHOT, etc.)
+      ts_format (TSFormat): Formato dos dados temporais (ARRAY, CSV, etc.).
+      ts_type (TSType): Tipo de série (NUMERIC, TEXTUAL).
+    """
+    self.dataset = dataset
+    self.start_date = start_date
+    self.end_date = end_date
+    self.periods = periods
+    self.prompt_type = prompt_type
+    self.ts_format = ts_format
+    self.ts_type = ts_type
 
-	def prompt(self):
-		st.write('---')
-		st.write('### Prompt')
-		lista_prompt, lista_exatos = DadosModel(dataset=self.dataset, data_inicio=self.data_inicio, data_fim=self.data_fim, qtd_periodos=self.qtd_periodos).dados_prompt()
-		prompt = PromptModel(lista_prompt=lista_prompt, tipo_prompt=self.tipo_prompt, tam_previsao=self.qtd_periodos, formato_dados=self.formato_dados, tipo_serie=self.tipo_serie).prompt()
-		st.code(
-			prompt,
-			language='python',
-			line_numbers=True,
-		)
-		Grafico().amostragem([v for _, v in lista_prompt])
-		return prompt, lista_exatos
+  def view(self):
+    window, y_true = Data(dataset=self.dataset, start_date=self.start_date, end_date=self.end_date, periods=self.periods).prompt()
+    prompt = PromptModel(window=window, periods=self.periods, prompt_type=self.prompt_type, ts_format=self.ts_format, ts_type=self.ts_type).generate()
+
+    st.write('---')
+    st.write('### Prompt')
+    st.code(prompt, language='python', line_numbers=True)
+
+    st.write('### Gráfico Série Temporal - Prompt')
+    Graph.sample(
+      title="Série Temporal - Prompt",
+      values=[v for _, v in window]
+    )
+    return prompt, y_true

@@ -2,12 +2,12 @@ import os
 import subprocess
 
 class Main:
-	def __init__(self):
-		pass
+  def __init__(self):
+    pass
 
-	def run(self):
-		os.makedirs("data", exist_ok=True)
-		subprocess.run(["streamlit", "run", "app.py"])
+  def run(self):
+    os.makedirs("data", exist_ok=True)
+    subprocess.run(["streamlit", "run", "app.py"])
 
 if __name__ == "__main__":
-	Main().run()
+  Main().run()
